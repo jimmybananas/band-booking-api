@@ -53,10 +53,10 @@ class MusicianServiceImplTest {
     }
 
     @Test
-    void getMusician_whenNotFound_throwsNotFound(){
+    void getMusician_whenNotFound_throwsNotFound() {
         when(musicianRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, ()-> musicianService.getMusician(1L));
+        assertThrows(NotFoundException.class, () -> musicianService.getMusician(1L));
     }
 
     @Test
@@ -88,7 +88,7 @@ class MusicianServiceImplTest {
     }
 
     @Test
-    void searchMusicians_whenQueryProvided_callFuzzySearch(){
+    void searchMusicians_whenQueryProvided_callFuzzySearch() {
         List<Musician> foundMusicians = new ArrayList<>(List.of(new Musician(), new Musician()));
 
         when(musicianRepository.fuzzySearch("John")).thenReturn(foundMusicians);
@@ -168,9 +168,9 @@ class MusicianServiceImplTest {
                 "email@email.com",
                 "555-555-5555",
                 List.of(1L, 2L, 3L),
-                List.of(1L,2L),
+                List.of(1L, 2L),
                 List.of(1L),
-                List.of(2L,5L)
+                List.of(2L, 5L)
         );
 
         Musician result = musicianService.updateMusician(1L, request);
@@ -190,10 +190,10 @@ class MusicianServiceImplTest {
     }
 
     @Test
-    void updateMusician_whenNotFound_throwsNotFound(){
+    void updateMusician_whenNotFound_throwsNotFound() {
         when(musicianRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, ()-> musicianService.updateMusician(1L, any()));
+        assertThrows(NotFoundException.class, () -> musicianService.updateMusician(1L, any()));
 
         verify(musicianRepository, never()).save(any());
     }
@@ -226,27 +226,27 @@ class MusicianServiceImplTest {
     }
 
     @Test
-    void addInstrument_musicianNotFound_throwsNotFound(){
+    void addInstrument_musicianNotFound_throwsNotFound() {
         Instrument instrument = new Instrument();
         instrument.setId(10L);
 
         when(instrumentRepository.findById(10L)).thenReturn(Optional.of(instrument));
         when(musicianRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, ()-> musicianService.addInstruments(1L, List.of(10L)));
+        assertThrows(NotFoundException.class, () -> musicianService.addInstruments(1L, List.of(10L)));
 
         verify(musicianRepository, never()).save(any());
     }
 
     @Test
-    void addInstrument_instrumentNotFound_throwsNotFound(){
+    void addInstrument_instrumentNotFound_throwsNotFound() {
         Musician musician = new Musician();
         musician.setId(1L);
 
         when(musicianRepository.findById(1L)).thenReturn(Optional.of(musician));
         when(instrumentRepository.findById(10L)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, ()-> musicianService.addInstruments(1L, List.of(10L)));
+        assertThrows(NotFoundException.class, () -> musicianService.addInstruments(1L, List.of(10L)));
 
         verify(musicianRepository, never()).save(any());
     }
@@ -275,7 +275,7 @@ class MusicianServiceImplTest {
     }
 
     @Test
-    void removeInstrument_whenInstrumentNotInList_badRequest(){
+    void removeInstrument_whenInstrumentNotInList_badRequest() {
         Musician musician = new Musician();
         musician.setId(1L);
         musician.setInstruments(new ArrayList<>());
@@ -286,7 +286,7 @@ class MusicianServiceImplTest {
         when(musicianRepository.findById(1L)).thenReturn(Optional.of(musician));
         when(instrumentRepository.findById(10L)).thenReturn(Optional.of(instrument));
 
-        assertThrows(BadRequestException.class, ()-> musicianService.removeInstruments(1L, List.of(10L)));
+        assertThrows(BadRequestException.class, () -> musicianService.removeInstruments(1L, List.of(10L)));
 
         verify(musicianRepository, never()).save(any());
         verify(auditLogger, never()).log(any(), any(), any(), any());
@@ -322,10 +322,35 @@ class MusicianServiceImplTest {
     }
 
     @Test
-    void removeMusicStyle() {
+    void addMusicStyle_whenNotFound_throwsBadRequest() {
+        Musician musician = new Musician();
+        musician.setId(1L);
+
+        when(musicianRepository.findById(1L)).thenReturn(Optional.of(musician));
+        when(musicStyleRepository.findById(10L)).thenReturn(Optional.empty());
+
+        assertThrows(BadRequestException.class, () -> musicianService.addMusicStyles(1L, List.of(10L)));
+
+        verify(musicianRepository, never()).save(any());
+        verify(auditLogger, never()).log(any(), any(), any(), any());
     }
 
     @Test
-    void deleteMusician() {
+    void removeMusicStyle_whenValid_() {
+        Musician musician = new Musician();
+        musician.setId(1L);
+
+        MusicStyle style = new MusicStyle();
+        style.setId(10L);
+
+        musician.setMusicStyles(List.of(style));
+
+        when(musicianRepository.findById(1L)).thenReturn(Optional.of(musician));
+        when(musicStyleRepository.findById(10L)).thenReturn(Optional.of(style));
+
+        Musician result = musicianService.removeMusicStyle(1L, List.of(10L));
+
+        assertFalse(result.getMusicStyles().contains(style));
+        assertEquals(1, result.getMusicStyles().size());
     }
 }

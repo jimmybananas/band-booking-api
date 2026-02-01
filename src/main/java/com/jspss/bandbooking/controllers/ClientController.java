@@ -9,7 +9,12 @@ import com.jspss.bandbooking.entities.Client;
 import com.jspss.bandbooking.mappers.BookingMapper;
 import com.jspss.bandbooking.mappers.ClientMapper;
 import com.jspss.bandbooking.dto.responses.ClientResponseDTO;
+import com.jspss.bandbooking.repositories.AuditLogRepository;
+import com.jspss.bandbooking.repositories.ClientRepository;
 import com.jspss.bandbooking.services.ClientService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +32,14 @@ public class ClientController {
     private final ClientService clientService;
     private final ClientMapper clientMapper;
     private final BookingMapper bookingMapper;
+    private final AuditLogRepository auditLogRepository;
+    private final ClientRepository clientRepository;
 
+    @Operation(summary = "Get client by ID.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Client found."),
+            @ApiResponse(responseCode = "404", description = "Client not found.")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> getClient(@PathVariable Long id){
         Client client = clientService.getClient(id);
@@ -43,6 +55,11 @@ public class ClientController {
                 .toList());
     }
 
+    @Operation(summary = "Create a new client.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Client successfully created."),
+            @ApiResponse(responseCode = "404", description = "Client could not be created.")
+    })
     @PostMapping()
     public ResponseEntity<ClientResponseDTO> createClient(@Valid @RequestBody CreateClientRequest request){
         Client saved = clientService.createClient(
@@ -54,6 +71,12 @@ public class ClientController {
                 .body(clientMapper.toDTO(saved));
     }
 
+    @Operation(summary = "Update a client.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Client successfully updated."),
+            @ApiResponse(responseCode = "400", description = "Client could not be updated."),
+            @ApiResponse(responseCode = "404", description = "Client not found.")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> updateClient(@PathVariable Long id, @Valid @RequestBody UpdateClientRequest request){
         Client updated = clientService.updateClient(id, request);
@@ -67,6 +90,11 @@ public class ClientController {
                 .map(clientMapper::toDTO).toList());
     }
 
+    @Operation(summary = "Get all bookings for a client.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "All bookings provided."),
+            @ApiResponse(responseCode = "404", description = "Client or bookings not found.")
+    })
     @GetMapping("/{clientId}/bookings")
     public ResponseEntity<List<BookingSummaryDTO>> getBookings(@PathVariable Long clientId){
         return ResponseEntity.ok(clientService.getBookings(clientId));

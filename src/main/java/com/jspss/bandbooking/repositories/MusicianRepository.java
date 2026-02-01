@@ -16,7 +16,7 @@ public interface MusicianRepository extends JpaRepository<Musician, Long> {
     List<Musician> findByBands_Id(Long bandId);
     List<Musician> findByInstruments_Id(Long instrumentId);
     List<Musician> findByMusicStyles_Id(Long styleId);
-    List<Musician> findByFull_Name(String fullName);
+    List<Musician> findByFullName(String fullName);
 
 
 

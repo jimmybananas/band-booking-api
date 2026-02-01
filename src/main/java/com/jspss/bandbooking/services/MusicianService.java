@@ -17,6 +17,6 @@ public interface MusicianService {
     Musician addMusicStyles(Long id, List<Long> styleIds);
     Musician removeInstruments(Long id, List<Long> instrumentIds);
     Musician removeMusicStyle(Long id, List<Long> styleIds);
-    void deleteMusician(Long id);
+
 
 }

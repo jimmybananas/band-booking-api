@@ -151,18 +151,5 @@ public class MusicianServiceImpl implements MusicianService {
         return musicianRepository.save(musician);
     }
 
-    @Override
-    public void deleteMusician(Long id) {
-        Musician musician = musicianRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Musician not found."));
 
-        musicianRepository.deleteById(id);
-        auditLogger.log(
-                "DELETE_MUSICIAN",
-                "Musician",
-                id,
-                "Musician deleted: " + musician.getFullName()
-
-        );
-    }
 }

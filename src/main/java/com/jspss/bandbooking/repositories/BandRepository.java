@@ -9,9 +9,8 @@ import java.util.List;
 
 @Repository
 public interface BandRepository extends JpaRepository<Band, Long> {
-    Long id(Long id);
-    List<Band> searchByName(String query);
+    List<Band> findByBandName(String query);
     List<Band> findByBandNameContainingIgnoreCase(String query);
-    boolean existsByNameIgnoreCase(String query);
+    boolean existsByBandNameIgnoreCase(String bandName);
 
 }

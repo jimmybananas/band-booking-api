@@ -50,7 +50,7 @@ public class BandServiceImpl implements BandService {
         String cleaned = bandName.trim();
         String normalized = normalizeName(cleaned);
 
-        if(bandRepository.existsByNameIgnoreCase(normalized))
+        if(bandRepository.existsByBandNameIgnoreCase(normalized))
             throw new BadRequestException("A band with this name already exists: " + cleaned);
         Band band = new Band();
         band.setBandName(capitalize(normalized));
